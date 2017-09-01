@@ -1,6 +1,15 @@
 #pragma once
 
+#include <vector>
 #include "Util.h"
+
+const std::vector<std::string> palabrasReservadas =
+{
+	"auto",	"else",	"long",	"switch", "break", "enum", "register", "typedef", "case", "extern",
+	"return", "union", "char", "float",	"short", "unsigned", "const", "for", "signed", "void",
+	"continue",	"goto",	"sizeof", "volatile", "default", "if", "static", "while", "do",	"int",
+	"struct", "double"
+};
 
 class Lexico
 {
@@ -20,19 +29,23 @@ protected:
 	}
 	void aceptacion(int edo)
 	{
+		if (esPalabraReservada(simbolo))
+			tipo = PALABRA_RESERVADA;
+		else
+			tipo = edo;
 		sigEstado(edo);
-		tipo = edo;
 		continua = false;
 	}
 	void aceptacionFija(int edo)
 	{
 		aceptacion(edo);
 		indiceCaracterActual--;
+		simbolo.pop_back();
 	}
 	bool esCaracterPuntuacion(char c) 	{ return (c == '_'); }
 	bool esOpRelacional(char c) 		{ return (c == '>' || c == '<'); }
 	bool esOpAsignacion(char c) 		{ return (c == '='); }
-	bool esDelimitador(char c) 			{ return (c == ';' || c == ',' || c == '\n'); }
+	bool esDelimitador(char c) 			{ return (c == ';' || c == ','); }
 	bool esParentesis(char c) 			{ return (c == '(' || c == ')'); }
 	bool esOpLogico(char c) 			{ return (c == '!'); }
 	bool esOpAdic(char c) 				{ return (c == '+' || c == '-'); }
@@ -53,4 +66,10 @@ public:
 	int dameTipo() const { return tipo; }
 
 	bool fin() const { return (indiceCaracterActual >= entrada.size()); }
+
+private:
+	bool esPalabraReservada(const std::string& simbolo)
+	{
+		return estaEnVector(palabrasReservadas, simbolo);
+	}
 };

@@ -24,7 +24,6 @@
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Defs.h" />
     <ClInclude Include="Lexico.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>

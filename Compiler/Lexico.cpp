@@ -1,7 +1,6 @@
 #include <sstream>
 #include <fstream>
 #include "Lexico.h"
-#include "Defs.h"
 
 Lexico::Lexico(std::ifstream& ifs)
 {
@@ -25,7 +24,7 @@ void Lexico::sigSimbolo()
 		{
 			c = entrada[indiceCaracterActual++];
 		}
-		while(c == ' ');
+		while(c == ' ' || c == '\t' || c == '\n');
 
 		switch(estado)
 		{
@@ -54,6 +53,8 @@ void Lexico::sigSimbolo()
 				sigEstado(AND);
 			else if (c == '|')
 				sigEstado(OR);
+			else if (c == '\0')
+				aceptacion(FINAL);
 			else
 				error();
 			break;

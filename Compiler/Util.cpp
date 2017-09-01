@@ -1,11 +1,10 @@
 #include <iostream>
 #include "Util.h"
-#include "Defs.h"
 #include "Lexico.h"
 
 void error()
 {
-	std::cerr << "ERROR: EXISTE UN CARACTER NO VALIDO\n";
+	std::cerr << "ERROR LEXICO: EXISTE UN CARACTER NO VALIDO\n";
 	pausarTerminar();
 	exit(EXIT_FAILURE);
 }
