@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Lexico.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Defs.h" />
+    <ClInclude Include="Lexico.h" />
+    <ClInclude Include="Util.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{5C9CE77E-4575-4DEC-8046-3C217EA4A4A0}</ProjectGuid>
@@ -110,8 +120,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
