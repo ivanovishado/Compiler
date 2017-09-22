@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClCompile Include="Lexico.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sintactico.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lexico.h" />
+    <ClInclude Include="Sintactico.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

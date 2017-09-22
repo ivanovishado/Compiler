@@ -8,16 +8,16 @@
 #include <fstream>
 #include "Lexico.h"
 #include "Util.h"
+#include "Sintactico.h"
 
 int main()
 {
-	std::ifstream ifs;
 	std::string nombreArchivo;
 
 	std::cout << "Dame nombre de archivo (con extension): ";
 	getline(std::cin, nombreArchivo);
 
-	ifs.open("..//Files//" + nombreArchivo, std::ios::in);
+	std::ifstream ifs("..//Files//" + nombreArchivo, std::ios::in);
 
 	if(!ifs.is_open())
 	{
@@ -26,14 +26,9 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-	Lexico lex(ifs);
+	Sintactico sintactico(ifs);
 
-	while(!lex.fin())
-	{
-		lex.sigSimbolo();
-		std::cout << "Simbolo= " << lex.dameSimbolo() << "\tTipo= " << recuperaNombreTipo(
-			lex.dameTipo()) << '\n';
-	}
+	sintactico.programa();
 
 	pausarTerminar();
 

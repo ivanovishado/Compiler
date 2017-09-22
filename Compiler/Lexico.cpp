@@ -35,10 +35,12 @@ void Lexico::sigSimbolo()
 				aceptacion(OP_MULT);
 			else if (esDelimitador(c))
 				aceptacion(DELIMITADOR);
-			else if (esParentesis(c))
-				aceptacion(PARENTESIS);
-			else if (esOpLogico(c))
-				sigEstado(OP_LOGICO);
+			else if (esParentesisApertura(c))
+				aceptacion(PARENTESIS_APERTURA);
+			else if (esParentesisCierre(c))
+				aceptacion(PARENTESIS_CIERRE);
+			else if (esOpNot(c))
+				sigEstado(OP_NOT);
 			else if (esOpAsignacion(c))
 				sigEstado(OP_ASIGNACION);
 			else if (esOpRelacional(c))
@@ -50,9 +52,9 @@ void Lexico::sigSimbolo()
 			else if (isdigit(c))
 				sigEstado(ENTERO);
 			else if (c == '&')
-				sigEstado(AND);
+				sigEstado(OP_AND);
 			else if (c == '|')
-				sigEstado(OR);
+				sigEstado(OP_OR);
 			else if (c == '\0')
 				aceptacion(FINAL);
 			else
@@ -95,11 +97,11 @@ void Lexico::sigSimbolo()
 				sigEstado(CADENA);
 			break;
 
-		case OP_LOGICO:
+		case OP_NOT:
 			if (esOpAsignacion(c))
 				aceptacion(OP_RELACIONAL);
 			else
-				aceptacionFija(OP_LOGICO);
+				aceptacionFija(OP_NOT);
 			break;
 
 		case OP_ASIGNACION:
@@ -116,16 +118,16 @@ void Lexico::sigSimbolo()
 				aceptacionFija(OP_RELACIONAL);
 			break;
 
-		case AND:
+		case OP_AND:
 			if (c == '&')
-				aceptacion(AND);
+				aceptacion(OP_AND);
 			else
 				error();
 			break;
 
-		case OR:
+		case OP_OR:
 			if (c == '|')
-				aceptacion(OR);
+				aceptacion(OP_OR);
 			else
 				error();
 			break;

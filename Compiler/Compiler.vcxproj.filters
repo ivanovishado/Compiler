@@ -24,6 +24,9 @@
     <ClCompile Include="Lexico.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sintactico.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lexico.h">
@@ -31,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="Util.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sintactico.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
