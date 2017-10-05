@@ -1,17 +1,13 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include "Util.h"
-
-const std::vector<std::string> palabrasReservadas =
-{
-	"if", "while", "do", "for", "return", "else"
-};
-
-const std::vector<std::string> tipos = { "int", "float", "double", "char", "void" };
 
 class Lexico
 {
+	const std::vector<std::string> TIPOS;
+
 protected:
 	size_t indiceCaracterActual;
 	std::string entrada;
@@ -53,42 +49,41 @@ protected:
 		indiceCaracterActual--;
 		simbolo.pop_back();
 	}
-	bool esCaracterPuntuacion(char c) 	{ return (c == '_'); }
+	bool esCaracterPuntuacion(char c) 	{ return c == '_'; }
 	bool esOpRelacional(char c) 		{ return (c == '>' || c == '<'); }
-	bool esOpAsignacion(char c) 		{ return (c == '='); }
-	bool esDelimitador(char c) 			{ return (c == ';' || c == ','); }
+	bool esOpAsignacion(char c) 		{ return c == '='; }
+	bool esEspacio(char c)				{ return c == ' '; }
+	bool esPuntoYComa(char c) 			{ return c == ';'; }
+	bool esComa(char c)					{ return c == ','; }
+	bool esDosPuntos(char c)			{ return c == ':'; }
 	bool esParentesisApertura(char c) 	{ return c == '('; }
 	bool esParentesisCierre(char c)		{ return c == ')'; }
-	bool esLlaveApertura(char c) { return c == '{'; }
-	bool esLlaveCierre(char c) { return c == '}'; }
-	bool esOpNot(char c) 				{ return (c == '!'); }
-	bool esOpAdic(char c) 				{ return (c == '+' || c == '-'); }
-	bool esOpMult(char c) 				{ return (c == '*' || c == '/'); }
+	bool esLlaveApertura(char c)		{ return c == '{'; }
+	bool esLlaveCierre(char c)			{ return c == '}'; }
+	bool esOpNot(char c) 				{ return c == '!'; }
+	bool esOpAdic(char c) 				{ return c == '+' || c == '-'; }
+	bool esOpMult(char c) 				{ return c == '*' || c == '/'; }
 	bool esFijo(char c)
 	{
-		return (esOpAdic(c) || esOpMult(c) || esOpAsignacion(c) || esOpRelacional(c)
-			   || esOpNot(c) || esDelimitador(c) || esParentesisApertura(c) || esParentesisCierre(c)
-				|| esCaracterPuntuacion(c) || esLlaveApertura(c) || esLlaveCierre(c));
+		return esOpAdic(c) || esOpMult(c) || esOpAsignacion(c) || esOpRelacional(c) || esComa(c)
+			   || esOpNot(c) || esPuntoYComa(c) || esDosPuntos(c) || esParentesisApertura(c) 
+				|| esParentesisCierre(c) || esLlaveApertura(c) || esLlaveCierre(c) || esEspacio(c);
 	}
 
 public:
-	explicit Lexico(std::ifstream& ifs);
+	explicit Lexico(std::string& nombreArchivo);
 
-	void sigSimbolo();
+	int sigSimbolo();
 
-	const char* dameSimbolo() const { return simbolo.c_str(); }
+	std::string dameSimbolo() const { return simbolo; }
 
 	int dameTipo() const { return tipo; }
 
-	bool fin() const { return (indiceCaracterActual >= entrada.size()); }
+	bool fin() const { return indiceCaracterActual >= entrada.size(); }
 
 private:
-	bool esPalabraReservada(const std::string& simbolo)
-	{
-		return estaEnVector(palabrasReservadas, simbolo);
-	}
 	bool esTipo(const std::string& simbolo)
 	{
-		return estaEnVector(tipos, simbolo);
+		return estaEnVector(TIPOS, simbolo);
 	}
 };

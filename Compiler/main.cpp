@@ -17,18 +17,22 @@ int main()
 	std::cout << "Dame nombre de archivo (con extension): ";
 	getline(std::cin, nombreArchivo);
 
-	std::ifstream ifs("..//Files//" + nombreArchivo, std::ios::in);
+	Sintactico sintactico(nombreArchivo);
 
-	if(!ifs.is_open())
+	sintactico.analiza();
+	
+	try
 	{
-		std::cerr << "Ocurrio un problema al abrir el archivo . . .\n";
+		sintactico.analiza();
+	}
+	catch(std::exception& e)
+	{
+		e.what();
 		pausarTerminar();
 		exit(EXIT_FAILURE);
 	}
 
-	Sintactico sintactico(ifs);
-
-	sintactico.programa();
+	std::cout << "La entrada es valida.\n";
 
 	pausarTerminar();
 

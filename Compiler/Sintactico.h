@@ -2,11 +2,24 @@
 
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include <stack>
 #include "Lexico.h"
 
 class Sintactico
 {
+	const int FILAS_TABLA_LR = 108;
+	const int COLUMNAS_TABLA_LR = 46;
+	const std::string NOMBRE_ARCHIVO_TABLA_LR = "tablaLR.txt";
+	const std::string NOMBRE_ARCHIVO_IDS_TABLA_LR = "ids.txt";
+	const std::string NOMBRE_ARCHIVO_CANT_GENERACIONES_TABLA_LR = "cantGeneraciones.txt";
+	std::vector<std::vector<int>> tablaLR;
+	std::vector<int> idsReglas;
+	std::vector<int> cantGeneracionesReglas;
+	std::stack<int> pila;
+
 protected:
+	//PODRÍAN SER CLASES AMIGAS
 	Lexico lexico;
 
 	void comprueba(std::string simbolo)
@@ -18,6 +31,9 @@ protected:
 	{
 		(lexico.dameTipo() == tipo) ? lexico.sigSimbolo() : error();
 	}
+
+	void desplazamiento(int leido, int accion);
+	void reduccion(int accion);
 
 	void asignacion();
 	void expresion();
@@ -44,12 +60,13 @@ protected:
 	void listaArgumentos();
 	void argumentos();
 	void atomo();
-	void puntoYComa(std::string sim);
 
 public:
-	Sintactico(std::ifstream& ifs);
+	Sintactico(std::string& nombreArchivo);
 
 	void programa();
+
+	void analiza();
 
 	std::string dameSimbolo()
 	{

@@ -1,18 +1,19 @@
 #include <sstream>
 #include <fstream>
 #include "Lexico.h"
+#include "Excepciones.h"
 
-Lexico::Lexico(std::ifstream& ifs)
+Lexico::Lexico(std::string& nombreArchivo) : TIPOS{ "int", "float", "double", "char", "void"}
 {
+	std::ifstream archivo = abrirArchivo(nombreArchivo);
 	std::stringstream ss;
-	ss << ifs.rdbuf();
+	ss << archivo.rdbuf();
 	entrada = ss.str();
-	ifs.close();
 
 	indiceCaracterActual = 0;
 }
 
-void Lexico::sigSimbolo()
+int Lexico::sigSimbolo()
 {
 	estado = INICIAL;
 	simbolo = "";
@@ -24,21 +25,31 @@ void Lexico::sigSimbolo()
 		{
 			c = entrada[indiceCaracterActual++];
 		}
-		while(c == ' ' || c == '\t' || c == '\n');
+		while (c == '\t' || c == '\n');
+
+		//std::cout << "Caracter leido= " << c << '\n';
 
 		switch(estado)
 		{
 		case INICIAL:
 			if (esOpAdic(c))
-				aceptacion(OP_ADIC);
+				aceptacion(OP_SUMA);
 			else if (esOpMult(c))
 				aceptacion(OP_MULT);
-			else if (esDelimitador(c))
-				aceptacion(DELIMITADOR);
+			else if (esPuntoYComa(c))
+				aceptacion(PUNTO_Y_COMA);
+			else if (esComa(c))
+				aceptacion(COMA);
 			else if (esParentesisApertura(c))
 				aceptacion(PARENTESIS_APERTURA);
 			else if (esParentesisCierre(c))
 				aceptacion(PARENTESIS_CIERRE);
+			else if (esLlaveApertura(c))
+				aceptacion(LLAVE_APERTURA);
+			else if (esLlaveCierre(c))
+				aceptacion(LLAVE_CIERRE);
+			else if (esDosPuntos(c))
+				aceptacion(DOS_PUNTOS);
 			else if (esOpNot(c))
 				sigEstado(OP_NOT);
 			else if (esOpAsignacion(c))
@@ -57,8 +68,10 @@ void Lexico::sigSimbolo()
 				sigEstado(OP_OR);
 			else if (c == '\0')
 				aceptacion(FINAL);
+			else if (esEspacio(c))
+				;
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 
 		case IDENTIFICADOR:
@@ -67,7 +80,7 @@ void Lexico::sigSimbolo()
 			else if (esFijo(c))
 				aceptacionFija(IDENTIFICADOR);
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 
 		case ENTERO:
@@ -78,7 +91,7 @@ void Lexico::sigSimbolo()
 			else if (esFijo(c))
 				aceptacionFija(ENTERO);
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 
 		case REAL:
@@ -87,7 +100,7 @@ void Lexico::sigSimbolo()
 			else if (esFijo(c))
 				aceptacionFija(REAL);
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 
 		case CADENA:
@@ -106,7 +119,7 @@ void Lexico::sigSimbolo()
 
 		case OP_ASIGNACION:
 			if (esOpAsignacion(c))
-				aceptacion(OP_RELACIONAL);
+				aceptacion(OP_IGUALDAD);
 			else
 				aceptacionFija(OP_ASIGNACION);
 			break;
@@ -122,15 +135,17 @@ void Lexico::sigSimbolo()
 			if (c == '&')
 				aceptacion(OP_AND);
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 
 		case OP_OR:
 			if (c == '|')
 				aceptacion(OP_OR);
 			else
-				error();
+				throw ExcepcionLexica();
 			break;
 		}
 	}
+	std::cout << "Simbolo aceptado= \"" << simbolo << "\" que es un: " << recuperaNombreTipo(tipo) << '\n';
+	return tipo;
 }

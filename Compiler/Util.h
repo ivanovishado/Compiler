@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 enum Tipos
 {
@@ -9,14 +10,15 @@ enum Tipos
 	IDENTIFICADOR,
 	CONSTANTE,
 	TIPO,
-	OP_ADIC,
+	OP_SUMA,
 	OP_MULT,
 	OP_RELACIONAL,
 	OP_OR,
 	OP_AND,
 	OP_NOT,
-	// OP_IGUALDAD, ?
-	DELIMITADOR,
+	OP_IGUALDAD,
+	PUNTO_Y_COMA,
+	COMA,
 	PARENTESIS_APERTURA,
 	PARENTESIS_CIERRE,
 	LLAVE_APERTURA,
@@ -29,16 +31,17 @@ enum Tipos
 	DOS_PUNTOS,
 	RETURN,
 	ELSE,
+	FINAL,
 	CADENA,
 	ENTERO,
 	REAL,
-	FIN,
-	FINAL
+	FIN
 };
 
 std::string recuperaNombreTipo(int tipo);
 void pausarTerminar();
 void error();
+std::ifstream abrirArchivo(const std::string& nombreArchivo);
 
 template <class T>
 bool estaEnVector(const std::vector<T> & v, const T & valor)

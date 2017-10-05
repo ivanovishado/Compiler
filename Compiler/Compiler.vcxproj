@@ -25,6 +25,7 @@
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Excepciones.h" />
     <ClInclude Include="Lexico.h" />
     <ClInclude Include="Sintactico.h" />
     <ClInclude Include="Util.h" />
