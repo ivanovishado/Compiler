@@ -1,5 +1,6 @@
 int foo(int uno, int dos)
 {
-	int hola = 3;
+	int hola;
+	hola = 4;
 	return uno + dos + tres;
 }

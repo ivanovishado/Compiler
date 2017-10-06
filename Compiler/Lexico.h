@@ -63,6 +63,8 @@ protected:
 	bool esLlaveApertura(char c)		{ return c == '{'; }
 	bool esLlaveCierre(char c)			{ return c == '}'; }
 	bool esOpNot(char c) 				{ return c == '!'; }
+	bool esOpAnd(char c)				{ return c == '&'; }
+	bool esOpOr(char c)					{ return c == '|'; }
 	bool esOpAdic(char c) 				{ return c == '+' || c == '-'; }
 	bool esOpMult(char c) 				{ return c == '*' || c == '/'; }
 	bool esFijo(char c)

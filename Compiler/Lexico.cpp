@@ -62,9 +62,9 @@ int Lexico::sigSimbolo()
 				sigEstado(IDENTIFICADOR);
 			else if (isdigit(c))
 				sigEstado(CONSTANTE);
-			else if (c == '&')
+			else if (esOpAnd(c))
 				sigEstado(OP_AND);
-			else if (c == '|')
+			else if (esOpOr(c))
 				sigEstado(OP_OR);
 			else if (c == '\0')
 				aceptacion(FINAL);
@@ -132,14 +132,14 @@ int Lexico::sigSimbolo()
 			break;
 
 		case OP_AND:
-			if (c == '&')
+			if (esOpAnd(c))
 				aceptacion(OP_AND);
 			else
 				throw ExcepcionLexica();
 			break;
 
 		case OP_OR:
-			if (c == '|')
+			if (esOpOr(c))
 				aceptacion(OP_OR);
 			else
 				throw ExcepcionLexica();
