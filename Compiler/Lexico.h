@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 #include "Util.h"
 
 class Lexico
@@ -42,6 +43,7 @@ protected:
 			tipo = edo;
 		sigEstado(edo);
 		continua = false;
+		std::cout << "Tipo= " << recuperaNombreTipo(tipo) << '\n';
 	}
 	void aceptacionFija(int edo)
 	{
@@ -82,7 +84,7 @@ public:
 	bool fin() const { return indiceCaracterActual >= entrada.size(); }
 
 private:
-	bool esTipo(const std::string& simbolo)
+	bool esTipo(const std::string& simbolo) const
 	{
 		return estaEnVector(TIPOS, simbolo);
 	}

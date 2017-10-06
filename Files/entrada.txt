@@ -1,4 +1,5 @@
-int foo(int a)
+int foo(int uno, int dos)
 {
-	return a * a;
+	int hola = 3;
+	return uno + dos + tres;
 }

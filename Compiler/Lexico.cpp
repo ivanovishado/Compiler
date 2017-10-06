@@ -61,7 +61,7 @@ int Lexico::sigSimbolo()
 			else if (esCaracterPuntuacion(c) || isalpha(c))
 				sigEstado(IDENTIFICADOR);
 			else if (isdigit(c))
-				sigEstado(ENTERO);
+				sigEstado(CONSTANTE);
 			else if (c == '&')
 				sigEstado(OP_AND);
 			else if (c == '|')
@@ -83,13 +83,13 @@ int Lexico::sigSimbolo()
 				throw ExcepcionLexica();
 			break;
 
-		case ENTERO:
+		case CONSTANTE:
 			if (isdigit(c))
-				sigEstado(ENTERO);
+				sigEstado(CONSTANTE);
 			else if (c == '.')
 				sigEstado(REAL);
 			else if (esFijo(c))
-				aceptacionFija(ENTERO);
+				aceptacionFija(CONSTANTE);
 			else
 				throw ExcepcionLexica();
 			break;

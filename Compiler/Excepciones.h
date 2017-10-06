@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <string>
 
 class ExcepcionLexica : public std::exception
 {

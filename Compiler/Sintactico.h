@@ -1,8 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <cstring>
-#include <fstream>
 #include <stack>
 #include "Lexico.h"
 
@@ -11,13 +8,13 @@ class Sintactico
 	const int FILAS_TABLA_LR = 108;
 	const int COLUMNAS_TABLA_LR = 46;
 	const std::string NOMBRE_ARCHIVO_TABLA_LR = "tablaLR.txt";
-	const std::string NOMBRE_ARCHIVO_IDS_TABLA_LR = "ids.txt";
-	const std::string NOMBRE_ARCHIVO_CANT_GENERACIONES_TABLA_LR = "cantGeneraciones.txt";
+	const std::string NOMBRE_ARCHIVO_INFO_REGLAS = "infoReglas.txt";
 	std::vector<std::vector<int>> tablaLR;
-	std::vector<int> idsReglas;
-	std::vector<int> cantGeneracionesReglas;
+	std::vector<std::pair<int, int>> infoReglas;
 	std::stack<int> pila;
 
+	void desplazamiento(int leido, int accion);
+	void reduccion(int accion);
 protected:
 	//PODRÍAN SER CLASES AMIGAS
 	Lexico lexico;
@@ -31,9 +28,6 @@ protected:
 	{
 		(lexico.dameTipo() == tipo) ? lexico.sigSimbolo() : error();
 	}
-
-	void desplazamiento(int leido, int accion);
-	void reduccion(int accion);
 
 	void asignacion();
 	void expresion();
@@ -62,18 +56,18 @@ protected:
 	void atomo();
 
 public:
-	Sintactico(std::string& nombreArchivo);
+	explicit Sintactico(std::string& nombreArchivo);
 
 	void programa();
 
 	void analiza();
 
-	std::string dameSimbolo()
+	std::string dameSimbolo() const
 	{
 		return lexico.dameSimbolo();
 	}
 
-	int dameTipo()
+	int dameTipo() const
 	{
 		return lexico.dameTipo();
 	}

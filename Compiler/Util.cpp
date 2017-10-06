@@ -44,6 +44,7 @@ std::string recuperaNombreTipo(int tipo)
 	case CADENA: 			return "Cadena";
 	case IDENTIFICADOR: 	return "Identificador";
 	case ENTERO: 			return "Entero";
+	case CONSTANTE:			return "Constante";
 	case REAL: 				return "Real";
 	case WHILE:				return "while";
 	case FOR:				return "for";

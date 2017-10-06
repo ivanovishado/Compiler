@@ -5,8 +5,7 @@
  */
 
 #include <iostream>
-#include <fstream>
-#include "Lexico.h"
+#include <string>
 #include "Util.h"
 #include "Sintactico.h"
 
@@ -18,8 +17,6 @@ int main()
 	getline(std::cin, nombreArchivo);
 
 	Sintactico sintactico(nombreArchivo);
-
-	sintactico.analiza();
 	
 	try
 	{
