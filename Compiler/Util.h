@@ -3,47 +3,47 @@
 #include <vector>
 #include <fstream>
 
-enum Tipos
+enum Types
 {
-	INICIAL = -1,
-	IDENTIFICADOR,
-	CONSTANTE,
-	TIPO,
-	OP_SUMA,
-	OP_MULT,
-	OP_RELACIONAL,
-	OP_OR,
-	OP_AND,
-	OP_NOT,
-	OP_IGUALDAD,
-	PUNTO_Y_COMA,
-	COMA,
-	PARENTESIS_APERTURA,
-	PARENTESIS_CIERRE,
-	LLAVE_APERTURA,
-	LLAVE_CIERRE,
-	OP_ASIGNACION,
+	INITIAL = -1,
+	IDENTIFIER,
+	CONSTANT,
+	TYPE,
+	ADD_OP,
+	MUL_OP,
+	RELATIONAL_OP,
+	OR_OP,
+	AND_OP,
+	NOT_OP,
+	EQUALITY_OP,
+	SEMICOLON,
+	COMMA,
+	START_PARENTHESES,
+	END_PARENTHESES,
+	START_BRACES,
+	END_BRACES,
+	ASIGNMENT_OP,
 	IF,
 	WHILE,
 	DO,
 	FOR,
-	DOS_PUNTOS,
+	COLON,
 	RETURN,
 	ELSE,
 	FINAL,
-	CADENA,
-	ENTERO,
-	REAL,
+	STRING,
+	INTEGER,
+	FLOAT,
 	FIN
 };
 
-std::string recuperaNombreTipo(int tipo);
-void pausarTerminar();
+std::string recoverTypeName(int type);
+void pauseTerminate();
 void error();
-std::ifstream abrirArchivo(const std::string& nombreArchivo);
+std::ifstream openFile(const std::string& filename);
 
 template <class T>
-bool estaEnVector(const std::vector<T> & v, const T & valor)
+bool isInVector(const std::vector<T> & v, const T & value)
 {
-	return std::find(v.begin(), v.end(), valor) != v.end();
+	return std::find(v.begin(), v.end(), value) != v.end();
 };

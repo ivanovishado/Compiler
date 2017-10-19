@@ -1,59 +1,59 @@
 #include <iostream>
 #include "Util.h"
-#include "Lexico.h"
+#include "LexicalAnalyzer.h"
 
-void pausarTerminar()
+void pauseTerminate()
 {
-	std::cout << "Presione entrar para terminar . . .";
+	std::cout << "Press enter to terminate . . .";
 	std::cin.get();
 }
 
-std::ifstream abrirArchivo(const std::string& nombreArchivo)
+std::ifstream openFile(const std::string& filename)
 {
-	std::ifstream archivo("../Files/"+nombreArchivo, std::ios::in);
+	std::ifstream file("../Files/"+filename, std::ios::in);
 
-	if (!archivo.is_open())
+	if (!file.is_open())
 	{
-		std::cerr << "Ocurrio un error al abrir el archivo . . .\n";
-		pausarTerminar();
+		std::cerr << "There was a problem opening the file . . .\n";
+		pauseTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	return archivo;
+	return file;
 }
 
-std::string recuperaNombreTipo(int tipo)
+std::string recoverTypeName(int type)
 {
-	switch (tipo)
+	switch (type)
 	{
-	case INICIAL: 			return "INICIAL";
-	case OP_SUMA: 			return "Operador de Adicion";
-	case OP_MULT: 			return "Operador de Multiplicacion";
-	case OP_RELACIONAL: 	return "Operador relacional";
-	case DOS_PUNTOS:		return "Dos puntos";
-	case PUNTO_Y_COMA: 		return "Punto y coma";
-	case COMA:				return "Coma";
-	case PARENTESIS_APERTURA: 		return "Parentesis de apertura";
-	case PARENTESIS_CIERRE: return "Parentesis de cierre";
-	case LLAVE_APERTURA:	return "Llave de apertura";
-	case LLAVE_CIERRE:		return "Llave de cierre";
-	case OP_NOT: 			return "Operador logico";
-	case OP_ASIGNACION: 	return "Operador de asignacion";
-	case OP_AND: 			return "AND";
-	case OP_OR: 			return "OR";
-	case CADENA: 			return "Cadena";
-	case IDENTIFICADOR: 	return "Identificador";
-	case ENTERO: 			return "Entero";
-	case CONSTANTE:			return "Constante";
-	case REAL: 				return "Real";
+	case INITIAL: 			return "INITIAL";
+	case ADD_OP: 			return "Add operator";
+	case MUL_OP: 			return "Multiplication operator";
+	case RELATIONAL_OP: 	return "Relational operator";
+	case COLON:				return "Colon";
+	case SEMICOLON: 		return "Semicolon";
+	case COMMA:				return "Comma";
+	case START_PARENTHESES: 		return "Start parentheses";
+	case END_PARENTHESES: return "End parentheses";
+	case START_BRACES:	return "Start braces";
+	case END_BRACES:		return "End braces";
+	case NOT_OP: 			return "Logic operator";
+	case ASIGNMENT_OP: 	return "Asignment operator";
+	case AND_OP: 			return "AND";
+	case OR_OP: 			return "OR";
+	case STRING: 			return "String";
+	case IDENTIFIER: 	return "Identifier";
+	case INTEGER: 			return "Integer";
+	case CONSTANT:			return "Constant";
+	case FLOAT: 				return "Float";
 	case WHILE:				return "while";
 	case FOR:				return "for";
 	case IF:				return "if";
 	case ELSE:				return "else";
 	case RETURN:			return "return";
-	case TIPO:				return "Tipo";
+	case TYPE:				return "Type";
 	case FIN: 				return "Fin";
 	case FINAL:				return "Final";
-	default: 				return "Tipo no definido";
+	default: 				return "Undefined type";
 	}
 }

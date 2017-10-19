@@ -5,51 +5,51 @@
 #include <string>
 #include "Util.h"
 
-class Lexico
+class LexicalAnalyzer
 {
-	const std::vector<std::string> TIPOS;
+	const std::vector<std::string> TYPES;
 
 protected:
-	size_t indiceCaracterActual;
-	std::string entrada;
-	std::string simbolo;
-	bool continua;
-	int estado;
-	int tipo;
+	size_t actualCharIndex;
+	std::string input;
+	std::string symbol;
+	bool continues;
+	int state;
+	int type;
 	char c;
 
 	void sigEstado(int edo)
 	{
-		estado = edo;
-		simbolo += c;
+		state = edo;
+		symbol += c;
 	}
 	void aceptacion(int edo)
 	{
-		if (simbolo == "if")
-			tipo = IF;
-		else if (simbolo == "while")
-			tipo = WHILE;
-		else if (simbolo == "do")
-			tipo = DO;
-		else if (simbolo == "for")
-			tipo = FOR;
-		else if (simbolo == "return")
-			tipo = RETURN;
-		else if (simbolo == "else")
-			tipo = ELSE;
-		else if (esTipo(simbolo))
-			tipo = TIPO;
+		if (symbol == "if")
+			type = IF;
+		else if (symbol == "while")
+			type = WHILE;
+		else if (symbol == "do")
+			type = DO;
+		else if (symbol == "for")
+			type = FOR;
+		else if (symbol == "return")
+			type = RETURN;
+		else if (symbol == "else")
+			type = ELSE;
+		else if (esTipo(symbol))
+			type = TYPE;
 		else
-			tipo = edo;
+			type = edo;
 		sigEstado(edo);
-		continua = false;
-		std::cout << "Tipo= " << recuperaNombreTipo(tipo) << '\n';
+		continues = false;
+		std::cout << "Tipo= " << recoverTypeName(type) << '\n';
 	}
 	void aceptacionFija(int edo)
 	{
 		aceptacion(edo);
-		indiceCaracterActual--;
-		simbolo.pop_back();
+		actualCharIndex--;
+		symbol.pop_back();
 	}
 	bool esCaracterPuntuacion(char c) 	{ return c == '_'; }
 	bool esOpRelacional(char c) 		{ return (c == '>' || c == '<'); }
@@ -75,19 +75,19 @@ protected:
 	}
 
 public:
-	explicit Lexico(std::string& nombreArchivo);
+	explicit LexicalAnalyzer(std::string& nombreArchivo);
 
-	int sigSimbolo();
+	int nextSymbol();
 
-	std::string dameSimbolo() const { return simbolo; }
+	std::string getSymbol() const { return symbol; }
 
-	int dameTipo() const { return tipo; }
+	int getType() const { return type; }
 
-	bool fin() const { return indiceCaracterActual >= entrada.size(); }
+	bool fin() const { return actualCharIndex >= input.size(); }
 
 private:
 	bool esTipo(const std::string& simbolo) const
 	{
-		return estaEnVector(TIPOS, simbolo);
+		return isInVector(TYPES, simbolo);
 	}
 };

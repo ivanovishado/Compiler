@@ -19,15 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Lexico.cpp" />
+    <ClCompile Include="LexicalAnalyzer.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Sintactico.cpp" />
+    <ClCompile Include="SyntaxAnalyzer.cpp" />
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Excepciones.h" />
-    <ClInclude Include="Lexico.h" />
-    <ClInclude Include="Sintactico.h" />
+    <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="LexicalAnalyzer.h" />
+    <ClInclude Include="SyntaxAnalyzer.h" />
     <ClInclude Include="Util.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -1,6 +1,0 @@
-int foo(int uno, int dos)
-{
-	int hola;
-	hola = 4;
-	return uno + dos + tres;
-}

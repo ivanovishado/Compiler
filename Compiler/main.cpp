@@ -1,37 +1,36 @@
 /*
  * @author Ivan Fernando Galaviz Mendoza
- * Seminario de Solución de Problemas de Traductores de Lenguajes II
- * Tarea 1 - Analizador Léxico
+ * Compilers
  */
 
 #include <iostream>
 #include <string>
 #include "Util.h"
-#include "Sintactico.h"
+#include "SyntaxAnalyzer.h"
 
 int main()
 {
-	std::string nombreArchivo;
+	std::string filename;
 
-	std::cout << "Dame nombre de archivo (con extension): ";
-	getline(std::cin, nombreArchivo);
+	std::cout << "Input filename (with extension): ";
+	getline(std::cin, filename);
 
-	Sintactico sintactico(nombreArchivo);
+	SyntaxAnalyzer syntaxAnalyzer(filename);
 	
 	try
 	{
-		sintactico.analiza();
+		syntaxAnalyzer.analyze();
 	}
 	catch(std::exception& e)
 	{
-		e.what();
-		pausarTerminar();
+		std::cerr << e.what() << '\n';
+		pauseTerminate();
 		exit(EXIT_FAILURE);
 	}
 
-	std::cout << "La entrada es valida.\n";
+	std::cout << "The input is valid!\n";
 
-	pausarTerminar();
+	pauseTerminate();
 
 	return EXIT_SUCCESS;
 }
