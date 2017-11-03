@@ -9,6 +9,34 @@ class LexicalAnalyzer
 {
 	const std::vector<std::string> TYPES;
 
+	bool isType(const std::string& symbol) const
+	{
+		return isInVector(TYPES, symbol);
+	}
+
+	bool isPunctuationChar(char c) { return c == '_'; }
+	bool isRelationalOp(char c) { return (c == '>' || c == '<'); }
+	bool isAsignmentOp(char c) { return c == '='; }
+	bool isSpace(char c) { return c == ' '; }
+	bool isSemicolon(char c) { return c == ';'; }
+	bool isComma(char c) { return c == ','; }
+	bool isColon(char c) { return c == ':'; }
+	bool isStartParentheses(char c) { return c == '('; }
+	bool isEndParentheses(char c) { return c == ')'; }
+	bool isStartBraces(char c) { return c == '{'; }
+	bool isEndBraces(char c) { return c == '}'; }
+	bool isNotOp(char c) { return c == '!'; }
+	bool isAndOp(char c) { return c == '&'; }
+	bool isOrOp(char c) { return c == '|'; }
+	bool isAddOp(char c) { return c == '+' || c == '-'; }
+	bool isMulOp(char c) { return c == '*' || c == '/'; }
+	bool isFixed(char c)
+	{
+		return isAddOp(c) || isMulOp(c) || isAsignmentOp(c) || isRelationalOp(c) || isComma(c)
+			|| isNotOp(c) || isSemicolon(c) || isColon(c) || isStartParentheses(c)
+			|| isEndParentheses(c) || isStartBraces(c) || isEndBraces(c) || isSpace(c);
+	}
+
 protected:
 	size_t actualCharIndex;
 	std::string input;
@@ -18,12 +46,12 @@ protected:
 	int type;
 	char c;
 
-	void sigEstado(int edo)
+	void nextState(int state)
 	{
-		state = edo;
+		this->state = state;
 		symbol += c;
 	}
-	void aceptacion(int edo)
+	void accept(int state)
 	{
 		if (symbol == "if")
 			type = IF;
@@ -37,45 +65,23 @@ protected:
 			type = RETURN;
 		else if (symbol == "else")
 			type = ELSE;
-		else if (esTipo(symbol))
+		else if (isType(symbol))
 			type = TYPE;
 		else
-			type = edo;
-		sigEstado(edo);
+			type = state;
+		nextState(state);
 		continues = false;
 		std::cout << "Tipo= " << recoverTypeName(type) << '\n';
 	}
-	void aceptacionFija(int edo)
+	void fixedAccept(int state)
 	{
-		aceptacion(edo);
+		accept(state);
 		actualCharIndex--;
 		symbol.pop_back();
 	}
-	bool esCaracterPuntuacion(char c) 	{ return c == '_'; }
-	bool esOpRelacional(char c) 		{ return (c == '>' || c == '<'); }
-	bool esOpAsignacion(char c) 		{ return c == '='; }
-	bool esEspacio(char c)				{ return c == ' '; }
-	bool esPuntoYComa(char c) 			{ return c == ';'; }
-	bool esComa(char c)					{ return c == ','; }
-	bool esDosPuntos(char c)			{ return c == ':'; }
-	bool esParentesisApertura(char c) 	{ return c == '('; }
-	bool esParentesisCierre(char c)		{ return c == ')'; }
-	bool esLlaveApertura(char c)		{ return c == '{'; }
-	bool esLlaveCierre(char c)			{ return c == '}'; }
-	bool esOpNot(char c) 				{ return c == '!'; }
-	bool esOpAnd(char c)				{ return c == '&'; }
-	bool esOpOr(char c)					{ return c == '|'; }
-	bool esOpAdic(char c) 				{ return c == '+' || c == '-'; }
-	bool esOpMult(char c) 				{ return c == '*' || c == '/'; }
-	bool esFijo(char c)
-	{
-		return esOpAdic(c) || esOpMult(c) || esOpAsignacion(c) || esOpRelacional(c) || esComa(c)
-			   || esOpNot(c) || esPuntoYComa(c) || esDosPuntos(c) || esParentesisApertura(c) 
-				|| esParentesisCierre(c) || esLlaveApertura(c) || esLlaveCierre(c) || esEspacio(c);
-	}
 
 public:
-	explicit LexicalAnalyzer(std::string& nombreArchivo);
+	explicit LexicalAnalyzer(std::string& filename);
 
 	int nextSymbol();
 
@@ -84,10 +90,4 @@ public:
 	int getType() const { return type; }
 
 	bool fin() const { return actualCharIndex >= input.size(); }
-
-private:
-	bool esTipo(const std::string& simbolo) const
-	{
-		return isInVector(TYPES, simbolo);
-	}
 };

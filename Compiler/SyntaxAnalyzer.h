@@ -2,6 +2,8 @@
 
 #include <stack>
 #include "LexicalAnalyzer.h"
+#include "Defs.h"
+#include <memory>
 
 class SyntaxAnalyzer
 {
@@ -11,10 +13,10 @@ class SyntaxAnalyzer
 	const std::string RULES_INFO_FILENAME = "rulesInfo.txt";
 	std::vector<std::vector<int>> lrTable;
 	std::vector<std::pair<int, int>> rulesInfo;
-	std::stack<int> stack;
+	std::stack<StackElement*> stack;
 
-	void desplazamiento(int read, int action);
-	void reduction(int action);
+	void shift(int read, int action);
+	void reduce(int action);
 protected:
 	//PODRÍAN SER CLASES AMIGAS
 	LexicalAnalyzer lex;

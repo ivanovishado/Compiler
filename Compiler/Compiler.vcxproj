@@ -25,6 +25,7 @@
     <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Defs.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="LexicalAnalyzer.h" />
     <ClInclude Include="SyntaxAnalyzer.h" />

@@ -10,7 +10,7 @@ void pauseTerminate()
 
 std::ifstream openFile(const std::string& filename)
 {
-	std::ifstream file("../Files/"+filename, std::ios::in);
+	std::ifstream file("../Files/" + filename, std::ios::in);
 
 	if (!file.is_open())
 	{

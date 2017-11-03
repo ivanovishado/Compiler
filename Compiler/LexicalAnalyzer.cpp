@@ -1,13 +1,14 @@
 #include <sstream>
 #include <fstream>
 #include "LexicalAnalyzer.h"
-#include "Excepciones.h"
+#include "Exceptions.h"
 
-LexicalAnalyzer::LexicalAnalyzer(std::string& nombreArchivo) : TYPES{ "int", "float", "double", "char", "void"}
+LexicalAnalyzer::LexicalAnalyzer(std::string& filename) :
+	TYPES{ "int", "float", "double", "char", "void"}
 {
-	std::ifstream archivo = openFile(nombreArchivo);
+	std::ifstream file = openFile(filename);
 	std::stringstream ss;
-	ss << archivo.rdbuf();
+	ss << file.rdbuf();
 	input = ss.str();
 
 	actualCharIndex = 0;
@@ -32,120 +33,120 @@ int LexicalAnalyzer::nextSymbol()
 		switch(state)
 		{
 		case INITIAL:
-			if (esOpAdic(c))
-				aceptacion(ADD_OP);
-			else if (esOpMult(c))
-				aceptacion(MUL_OP);
-			else if (esPuntoYComa(c))
-				aceptacion(SEMICOLON);
-			else if (esComa(c))
-				aceptacion(COMMA);
-			else if (esParentesisApertura(c))
-				aceptacion(START_PARENTHESES);
-			else if (esParentesisCierre(c))
-				aceptacion(END_PARENTHESES);
-			else if (esLlaveApertura(c))
-				aceptacion(START_BRACES);
-			else if (esLlaveCierre(c))
-				aceptacion(END_BRACES);
-			else if (esDosPuntos(c))
-				aceptacion(COLON);
-			else if (esOpNot(c))
-				sigEstado(NOT_OP);
-			else if (esOpAsignacion(c))
-				sigEstado(ASIGNMENT_OP);
-			else if (esOpRelacional(c))
-				sigEstado(RELATIONAL_OP);
+			if (isAddOp(c))
+				accept(ADD_OP);
+			else if (isMulOp(c))
+				accept(MUL_OP);
+			else if (isSemicolon(c))
+				accept(SEMICOLON);
+			else if (isComma(c))
+				accept(COMMA);
+			else if (isStartParentheses(c))
+				accept(START_PARENTHESES);
+			else if (isEndParentheses(c))
+				accept(END_PARENTHESES);
+			else if (isStartBraces(c))
+				accept(START_BRACES);
+			else if (isEndBraces(c))
+				accept(END_BRACES);
+			else if (isColon(c))
+				accept(COLON);
+			else if (isNotOp(c))
+				nextState(NOT_OP);
+			else if (isAsignmentOp(c))
+				nextState(ASIGNMENT_OP);
+			else if (isRelationalOp(c))
+				nextState(RELATIONAL_OP);
 			else if (c == '\"')
-				sigEstado(STRING);
-			else if (esCaracterPuntuacion(c) || isalpha(c))
-				sigEstado(IDENTIFIER);
+				nextState(STRING);
+			else if (isPunctuationChar(c) || isalpha(c))
+				nextState(IDENTIFIER);
 			else if (isdigit(c))
-				sigEstado(CONSTANT);
-			else if (esOpAnd(c))
-				sigEstado(AND_OP);
-			else if (esOpOr(c))
-				sigEstado(OR_OP);
+				nextState(CONSTANT);
+			else if (isAndOp(c))
+				nextState(AND_OP);
+			else if (isOrOp(c))
+				nextState(OR_OP);
 			else if (c == '\0')
-				aceptacion(FINAL);
-			else if (esEspacio(c))
+				accept(FINAL);
+			else if (isSpace(c))
 				;
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 
 		case IDENTIFIER:
-			if (isalpha(c) || isdigit(c) || esCaracterPuntuacion(c))
-				sigEstado(IDENTIFIER);
-			else if (esFijo(c))
-				aceptacionFija(IDENTIFIER);
+			if (isalpha(c) || isdigit(c) || isPunctuationChar(c))
+				nextState(IDENTIFIER);
+			else if (isFixed(c))
+				fixedAccept(IDENTIFIER);
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 
 		case CONSTANT:
 			if (isdigit(c))
-				sigEstado(CONSTANT);
+				nextState(CONSTANT);
 			else if (c == '.')
-				sigEstado(FLOAT);
-			else if (esFijo(c))
-				aceptacionFija(CONSTANT);
+				nextState(FLOAT);
+			else if (isFixed(c))
+				fixedAccept(CONSTANT);
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 
 		case FLOAT:
 			if (isdigit(c))
-				sigEstado(FLOAT);
-			else if (esFijo(c))
-				aceptacionFija(FLOAT);
+				nextState(FLOAT);
+			else if (isFixed(c))
+				fixedAccept(FLOAT);
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 
 		case STRING:
 			if (c == '\"')
-				aceptacion(STRING);
+				accept(STRING);
 			else
-				sigEstado(STRING);
+				nextState(STRING);
 			break;
 
 		case NOT_OP:
-			if (esOpAsignacion(c))
-				aceptacion(RELATIONAL_OP);
+			if (isAsignmentOp(c))
+				accept(RELATIONAL_OP);
 			else
-				aceptacionFija(NOT_OP);
+				fixedAccept(NOT_OP);
 			break;
 
 		case ASIGNMENT_OP:
-			if (esOpAsignacion(c))
-				aceptacion(EQUALITY_OP);
+			if (isAsignmentOp(c))
+				accept(EQUALITY_OP);
 			else
-				aceptacionFija(ASIGNMENT_OP);
+				fixedAccept(ASIGNMENT_OP);
 			break;
 
 		case RELATIONAL_OP:
-			if (esOpAsignacion(c))
-				aceptacion(RELATIONAL_OP);
+			if (isAsignmentOp(c))
+				accept(RELATIONAL_OP);
 			else
-				aceptacionFija(RELATIONAL_OP);
+				fixedAccept(RELATIONAL_OP);
 			break;
 
 		case AND_OP:
-			if (esOpAnd(c))
-				aceptacion(AND_OP);
+			if (isAndOp(c))
+				accept(AND_OP);
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 
 		case OR_OP:
-			if (esOpOr(c))
-				aceptacion(OR_OP);
+			if (isOrOp(c))
+				accept(OR_OP);
 			else
-				throw ExcepcionLexica();
+				throw LexicalException();
 			break;
 		}
 	}
-	std::cout << "Simbolo aceptado= \"" << symbol << "\" que es un: " << recoverTypeName(type) << '\n';
+	std::cout << "Accepted symbol= \"" << symbol << "\" which is: " << recoverTypeName(type)<<'\n';
 	return type;
 }
