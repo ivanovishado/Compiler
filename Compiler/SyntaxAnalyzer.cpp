@@ -55,7 +55,6 @@ void SyntaxAnalyzer::shift(int lexID, int action)
 {
 	// pila.push(NotTerminal (nodo))
 	//stack.push(action);
-	//stack.push(new NotTerminal(read));
 	stack.push(new Terminal(lex.getSymbol())); // ya no es necesario el lexID?
 	stack.push(new State(action));
 }
@@ -206,24 +205,48 @@ void SyntaxAnalyzer::reduce(int action)
 	case 34:// <ListaArgumentos> ::= , <Expresion> <ListaArgumentos> 
 
 		stack.pop();
-		aux = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		aux = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita la lsta de argumentos
 		stack.pop();
-		//aux = ((NotTerminal)stack.pop()).node;//quita la lsta de argumentos
+		//aux = ((NotTerminal)stack.pop()).node;
 		stack.pop();
-		node = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		node = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita expresion
 		stack.pop();
-		//node = ((NotTerminal)stack.pop()).node;//quita expresion
+		//node = ((NotTerminal)stack.pop()).node;
 		stack.pop();
 		stack.pop();//quita la ,
 		//node.next = aux;
 		node->setNext(aux);
 		break;
 
-	/*case 37: // <Atomo> :: = constante
+	case 36: // <Atomo> ::= id
+		stack.pop();
+		node = new Id(dynamic_cast<Terminal*>(stack.top())->getSymbol());
+		stack.pop();
+		break;
+	
+	case 37: // <Atomo> :: = constante
 		stack.pop();
 		node = new Constant(dynamic_cast<Terminal*>(stack.top())->getSymbol());
 		stack.pop();
-		break;*/
+		break;
+
+	case 38: // <LlamadaFunc> ::= id ( <Argumentos> )
+		node = new FuncCall(stack);
+		break;
+
+	case 42: // <Expresion> ::= opSuma <Expresion>
+	case 43: // <Expresion> ::= opNot <Expresion>
+		node = new Operation1(stack);
+		break;
+
+	case 44: // <Expresion> opMul <Expresion>
+	case 45: // <Expresion> opSuma <Expresion>
+	case 46: // <Expresion> opRelac <Expresion>
+	case 47: // <Expresion> opIgualdad <Expresion>
+	case 48: // <Expresion> opAnd <Expresion>
+	case 49: // <Expresion> opOr <Expresion>
+		node = new Operation2(stack);
+		break;
 
 		//aqui cae R2,R7,R10,R12,R15,R19,R28,R31,R33
 	default:

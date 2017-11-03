@@ -234,9 +234,9 @@ public:
 	If(std::stack<StackElement*>& stack)
 	{
 		stack.pop();
-		other = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		other = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita otro
 		stack.pop();
-		//other = ((NotTerminal)stack.pop()).getNode();//quita otro
+		//other = ((NotTerminal)stack.pop()).getNode();
 		stack.pop();
 		sentenceBlock = dynamic_cast<NotTerminal*>(stack.top())->getNode();
 		stack.pop();
