@@ -18,7 +18,6 @@ class SyntaxAnalyzer
 	void shift(int read, int action);
 	void reduce(int action);
 protected:
-	//PODRÍAN SER CLASES AMIGAS
 	LexicalAnalyzer lex;
 
 	void check(std::string symbol)
@@ -34,7 +33,7 @@ protected:
 public:
 	explicit SyntaxAnalyzer(std::string& filename);
 
-	void analyze();
+	void analyze(Node* &root);
 
 	std::string getSymbol() const
 	{
@@ -45,6 +44,5 @@ public:
 	{
 		return lex.getType();
 	}
-
 };
 

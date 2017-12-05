@@ -20,12 +20,12 @@ SyntaxAnalyzer::SyntaxAnalyzer(std::string& filename) : lrTable(LR_TABLE_ROWS,
 		rulesInfo.push_back({ id, productionsAmount * 2 });
 }
 
-void SyntaxAnalyzer::analyze()
+void SyntaxAnalyzer::analyze(Node* &root)
 {
 	stack.push(new State(0));
 	bool canRead = true;
 	int lexID;
-	while (true)
+	do
 	{
 		if (canRead)
 			lexID = lex.nextSymbol();
@@ -40,6 +40,8 @@ void SyntaxAnalyzer::analyze()
 		}
 		else if (action == -1)
 		{
+			stack.pop();
+			root = dynamic_cast<NotTerminal*>(stack.top())->getNode();
 			std::cout << "Syntactically valid!\n";
 			break; // Accepted
 		}	
@@ -48,7 +50,7 @@ void SyntaxAnalyzer::analyze()
 			reduce(action);
 			canRead = false;
 		}
-	}
+	} while (true);
 }
 
 void SyntaxAnalyzer::shift(int lexID, int action)
@@ -75,7 +77,7 @@ void SyntaxAnalyzer::reduce(int action)
 	Node* node = nullptr;
 	Node* aux;
 
-	std::cout << "Rule= " << rule << '\n';
+	// std::cout << "Rule= " << rule << '\n';
 
 	switch (rule + 1)
 	{
@@ -119,15 +121,15 @@ void SyntaxAnalyzer::reduce(int action)
 	case 8: //<ListaVar> ::= , id <ListaVar>
 	{
 		stack.pop();//quita estado
-		Node* lvar = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		Node* varList = dynamic_cast<NotTerminal*>(stack.top())->getNode();
 		stack.pop();
-		//Node lvar = ((NotTerminal)stack.pop()).node;
+		//Node varList = ((NotTerminal)stack.pop()).node;
 		stack.pop();//quita estado
 		node = new Id(dynamic_cast<Terminal*>(stack.top())->getSymbol());
 		stack.pop();
 		//node = new Id(((Terminal)stack.pop()).simbolo);//quita id
-		//node.next = lvar;
-		node->setNext(lvar);
+		//node.next = varList;
+		node->setNext(varList);
 		stack.pop();//quita estado
 		stack.pop();//quita la coma
 		break;
@@ -254,7 +256,6 @@ void SyntaxAnalyzer::reduce(int action)
 			stack.pop();
 	}
 
-	//textBox1.Text=Convert.ToString(((State)stack.top()).numestado);
 	int row = dynamic_cast<State*>(stack.top())->getStateNum();
 	//row=Convert.ToInt32(stack.top());
 

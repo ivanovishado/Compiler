@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <fstream>
+#include "Defs.h"
 
 enum Types
 {

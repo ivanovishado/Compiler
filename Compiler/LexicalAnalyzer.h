@@ -71,7 +71,7 @@ protected:
 			type = state;
 		nextState(state);
 		continues = false;
-		std::cout << "Tipo= " << recoverTypeName(type) << '\n';
+		//std::cout << "Tipo= " << recoverTypeName(type) << '\n';
 	}
 	void fixedAccept(int state)
 	{

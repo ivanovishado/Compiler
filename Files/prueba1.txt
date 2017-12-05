@@ -1,0 +1,23 @@
+int fact(int a)
+{
+	int x,y;
+	float j;
+	if(a==1){
+		return 1;  
+	}
+	else{
+		x=a-1;
+		j=fact(x)*a;
+	  	return y;
+	}
+
+}
+
+int main(){
+	float a,x;
+	a=1+2;
+	a=fact(3);
+	x=nose(4);
+	print(a);
+	return a;
+}
