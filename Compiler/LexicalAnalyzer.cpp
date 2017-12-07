@@ -6,7 +6,7 @@
 LexicalAnalyzer::LexicalAnalyzer(std::string& filename) :
 	TYPES{ "int", "float", "double", "char", "void"}
 {
-	std::ifstream file = openFile(filename);
+	auto file = openFile(filename);
 	std::stringstream ss;
 	ss << file.rdbuf();
 	input = ss.str();

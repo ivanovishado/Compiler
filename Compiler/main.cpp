@@ -44,9 +44,6 @@ int main()
 
 	root->validateTypes(symbolsTable, errors);
 
-	std::cout << symbolsTable.size();
-	printTable(symbolsTable);
-
 	if (errors.size() > 0)
 	{
 		std::cout << "Semantic Errors:\n";
@@ -56,8 +53,7 @@ int main()
 		exit(EXIT_FAILURE);
 	}
 
-
-	std::cout << "ÉXITO!!!\n";
+	writeASMCodeInFile(filename, root->generateCode());
 
 	pauseTerminate();
 

@@ -31,7 +31,7 @@ void SyntaxAnalyzer::analyze(Node* &root)
 			lexID = lex.nextSymbol();
 		//int action = lrTable[stack.top()][lexID];
 		int action = lrTable[dynamic_cast<State*>(stack.top())->getStateNum()][lexID];
-		if (action == 0)
+		if (action == 0) // error
 			throw SyntaxException("The LR table threw an error.");
 		if (action > 0)
 		{
@@ -91,13 +91,11 @@ void SyntaxAnalyzer::reduce(int action)
 	case 20:	//<Sentencias> ::= <Sentencia> <Sentencias>
 	case 32:	//<Argumentos> ::= <Expresion> <ListaArgumentos>
 		stack.pop();//quita estado
-		aux = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		aux = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita <definiciones>
 		stack.pop();
-		//Node* aux = ((NotTerminal)stack.pop()).node;//quita <definiciones>
 		stack.pop();//quita estado
-		node = dynamic_cast<NotTerminal*>(stack.top())->getNode();
+		node = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita <definicion>
 		stack.pop();
-		//node = ((NotTerminal)stack.pop()).node;//quita <definicion>
 		node->setNext(aux);
 		break;
 	case 1:
@@ -256,12 +254,11 @@ void SyntaxAnalyzer::reduce(int action)
 			stack.pop();
 	}
 
-	int row = dynamic_cast<State*>(stack.top())->getStateNum();
 	//row=Convert.ToInt32(stack.top());
 
-	int column = rulesInfo[rule].first;
-	int transition = lrTable[row][column];
-	NotTerminal* nt = new NotTerminal(rulesInfo[rule].first);
+	int ruleID = rulesInfo[rule].first;
+	int transition = lrTable[dynamic_cast<State*>(stack.top())->getStateNum()][ruleID];
+	NotTerminal* nt = new NotTerminal(ruleID);
 	nt->setNode(node);
 	stack.push(nt);
 	stack.push(new State(transition));

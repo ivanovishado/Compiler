@@ -1,5 +1,7 @@
 #pragma once
 #include <stack>
+#include <vector>
+#include <cctype>
 
 class StackElement
 {
@@ -72,6 +74,7 @@ inline char searchType(std::vector<SymbolsTableElement*>& symbolsTable)
 		if (t->getID() == t->getScope())
 			return t->getType();
 	}
+	return 'v';
 }
 
 inline std::string searchType3(std::vector<SymbolsTableElement*>& symbolsTable)
@@ -81,6 +84,7 @@ inline std::string searchType3(std::vector<SymbolsTableElement*>& symbolsTable)
 		if (t->getID() == t->getScope())
 			return t->getScope();
 	}
+	return "";
 }
 
 inline char searchType(std::vector<SymbolsTableElement*>& symbolsTable, const std::string& id,
@@ -93,19 +97,15 @@ inline char searchType(std::vector<SymbolsTableElement*>& symbolsTable, const st
 			return tableElement->getType();
 	}
 
-	for (int i = 0; i < id.size(); i++)
+	for (size_t i = 0; i < id.size(); i++)
 	{
 		if (isdigit(id[i]))
 		{
 			if (id[i] == '.')
-			{
 				return 'f';
-			}
 		}
 		else
-		{
 			return 'e';
-		}
 	}
 	return 'i';
 }
@@ -116,10 +116,11 @@ protected:
 	std::string symbol;
 	std::string classType;
 	char dataType;
-	
 	Node* next;
+	static int labelNum;
 
 public:
+	static std::string varglobal;
 	std::string parametersStr;
 	std::string scope;
 
@@ -142,6 +143,13 @@ public:
 	{
 		return dataType;
 	}
+
+	std::string getClassType() const
+	{
+		return classType;
+	}
+
+	std::string nextLabel();
 
 	static char getType(Node* node)
 	{
@@ -179,6 +187,20 @@ public:
 				next->scope = scope;
 			next->validateTypes(symbolsTable, s, errors);
 		}
+	}
+
+	virtual std::string generateCode()
+	{
+		if (next)
+			return next->generateCode();
+		return "";
+	}
+
+	virtual std::string generateCodeLocalVar()
+	{
+		if (next)
+			return next->generateCodeLocalVar();
+		return "";
 	}
 };
 
@@ -268,6 +290,10 @@ public:
 	{
 		dataType = searchType(symbolsTable, symbol, s);
 	}
+	std::string generateCode() override
+	{
+		return "push " + symbol + "\n";
+	}
 };
 
 class Type : public Node
@@ -277,51 +303,21 @@ public:
 	{
 		symbol = _symbol;
 	}
-};
-
-class DefVar : public Node
-{
-	Node* type;
-	Node* id;
-	Node* varList;
-
-public:
-	DefVar(std::stack<StackElement*>& stack)//<DefVar> ::= tipo id <ListaVar> ; 
+	std::string generateCode() override
 	{
-		stack.pop();//quita estado
-		stack.pop(); //quita  ;
-		stack.pop(); //quita estado estado
-		varList = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita ListaVar
-		stack.pop();
-		stack.pop(); //quita estado
-		id = new Id(dynamic_cast<Terminal*>(stack.top())->getSymbol()); // quita Id
-		stack.pop();
-		stack.pop(); //quita estado
-		type = new Type(dynamic_cast<Terminal*>(stack.top())->getSymbol()); // quita tipo
-		stack.pop();
+		if (symbol == "int")
+			return " DWORD 0 ";
+		if (symbol == "float")
+			return " real4 0.0 ";
+		return "";
 	}
-	void validateTypes(std::vector<SymbolsTableElement*>& symbolsTable,
-		std::vector<std::string>& errors) override
+	std::string generateCodeLocalVar() override
 	{
-		dataType = getType(type);
-		if (!exists(symbolsTable, id->getSymbol(), dataType, scope))
-			symbolsTable.push_back(new SymbolsTableElement(id->getSymbol(), dataType, scope));
-		else
-			errors.push_back("La variable " + id->getSymbol() + " ya existe.");
-		auto aux = varList;
-		while (aux)
-		{
-			if (!exists(symbolsTable, aux->getSymbol(), dataType, scope))
-				symbolsTable.push_back(new SymbolsTableElement(aux->getSymbol(), dataType, scope));
-			else
-				errors.push_back("La variable " + aux->getSymbol() + " ya existe.");
-			aux = aux->getNext();
-			if (next)
-			{
-				next->scope = scope;
-				next->validateTypes(symbolsTable, errors);
-			}
-		}
+		if (symbol == "int")
+			return ": DWORD ";
+		if (symbol == "float")
+			return ": real4 ";
+		return "";
 	}
 };
 
@@ -333,7 +329,7 @@ class DefFunc : public Node
 	Node* blockFunc;
 
 public:
-	static std::string varlocal;
+	static std::string localVar;
 	DefFunc(std::stack<StackElement*>& stack)//<DefFunc> ::= tipo id ( <Parametros> ) <BloqFunc> 
 	{
 		stack.pop();//quita estado
@@ -388,6 +384,122 @@ public:
 			next->validateTypes(symbolsTable, errors);
 		}
 	}
+	std::string generateCode() override
+	{
+		scope = id->getSymbol();
+		std::string code;
+		std::string blockCode = "";
+		code = "\n" + id->getSymbol() + " proc";
+
+		if (parameters)
+		{
+			std::string parametersCode = parameters->generateCode();
+			parametersCode.pop_back();
+			code += parametersCode;
+		}
+
+		if (blockFunc)
+			blockCode += blockFunc->generateCode();
+
+		code += "\n" + localVar + blockCode + "\nret\n" + id->getSymbol() + " endp\n";
+
+		localVar = "";
+		if (next)
+			return code += next->generateCode();
+		return code;
+	}
+};
+
+class DefVar : public Node
+{
+	Node* type;
+	Node* id;
+	Node* varList;
+
+public:
+	DefVar(std::stack<StackElement*>& stack)//<DefVar> ::= tipo id <ListaVar> ; 
+	{
+		stack.pop();//quita estado
+		stack.pop(); //quita  ;
+		stack.pop(); //quita estado estado
+		varList = dynamic_cast<NotTerminal*>(stack.top())->getNode(); //quita ListaVar
+		stack.pop();
+		stack.pop(); //quita estado
+		id = new Id(dynamic_cast<Terminal*>(stack.top())->getSymbol()); // quita Id
+		stack.pop();
+		stack.pop(); //quita estado
+		type = new Type(dynamic_cast<Terminal*>(stack.top())->getSymbol()); // quita tipo
+		stack.pop();
+	}
+	void validateTypes(std::vector<SymbolsTableElement*>& symbolsTable,
+		std::vector<std::string>& errors) override
+	{
+		dataType = getType(type);
+		if (!exists(symbolsTable, id->getSymbol(), dataType, scope))
+			symbolsTable.push_back(new SymbolsTableElement(id->getSymbol(), dataType, scope));
+		else
+			errors.push_back("La variable " + id->getSymbol() + " ya existe.");
+		auto aux = varList;
+		while (aux)
+		{
+			if (!exists(symbolsTable, aux->getSymbol(), dataType, scope))
+				symbolsTable.push_back(new SymbolsTableElement(aux->getSymbol(), dataType, scope));
+			else
+				errors.push_back("La variable " + aux->getSymbol() + " ya existe.");
+			aux = aux->getNext();
+			if (next)
+			{
+				next->scope = scope;
+				next->validateTypes(symbolsTable, errors);
+			}
+		}
+	}
+	std::string generateCode() override
+	{
+		std::string code;
+		Node* aux = varList;
+		std::string dataType;
+		std::string vars;
+
+		if (scope == "")
+		{
+			dataType = type->generateCode();
+			vars = id->getSymbol() + dataType + "\n";
+			varglobal += vars;
+		}
+		else
+		{
+			dataType = type->generateCodeLocalVar();
+			vars = id->getSymbol() + dataType;
+			DefFunc::localVar += "local " + vars + "\n";
+		}
+
+		if (scope == "")
+		{
+			while (aux)
+			{
+				dataType = type->generateCode();
+				vars = aux->getSymbol() + dataType + "\n";
+				varglobal += vars;
+				aux = aux->getNext();
+			}
+		}
+		else
+		{
+			while (aux)
+			{
+				dataType = type->generateCodeLocalVar();
+				vars = aux->getSymbol() + dataType;
+				DefFunc::localVar += "local " + vars + "\n";
+				aux = aux->getNext();
+			}
+		}
+		if (varList)
+			code += varList->generateCode();
+		if (next)
+			code += next->generateCode();
+		return code;
+	}
 };
 
 class Parameters : public Node	//<Parametros> ::= tipo id <ListaParam> 
@@ -426,6 +538,22 @@ public:
 			next->scope = scope;
 			next->validateTypes(symbolsTable, errors);
 		}
+	}
+
+	std::string generateCode() override
+	{
+		std::string code = "";
+		if (type->getSymbol() == "int")
+			code += " " + id->getSymbol() + " : DWORD,";
+		else
+			code += " " + id->getSymbol() + " : real 4,";
+
+		if (parametersList)
+			code += parametersList->generateCode();
+		if (next)
+			code += next->generateCode();
+
+		return code;
 	}
 };
 
@@ -477,6 +605,23 @@ public:
 			next->validateTypes(symbolsTable, errors);
 		}
 	}
+
+	std::string generateCode() override
+	{
+		std::string code = "";
+		if (expression->getClassType() == "cons" || expression->getClassType() == "id")
+			code += "\n\tmov eax," + expression->getSymbol() + "\n";
+		else if (expression->getSymbol() != "+" && expression->getSymbol() != "-"
+			&& expression->getSymbol() != "*" && expression->getSymbol() != "/")
+			code += expression->generateCode();
+		else
+			code += expression->generateCode() + "\n\tpop eax";
+		code += "\n\tmov " + id->getSymbol() + ",eax";
+
+		if (next)
+			return code += next->generateCode();
+		return code;
+	}
 };
 
 class If : public Node//<Sentencia> ::= if ( <Expresion> ) <SentenciaBloque> <Otro> 
@@ -522,6 +667,8 @@ public:
 			next->validateTypes(symbolsTable, errors);
 		}
 	}
+
+	std::string generateCode();
 };
 
 class While : public Node //<Sentencia> ::= while ( <Expresion> ) <Bloque> 
@@ -640,6 +787,14 @@ public:
 				+ " no es igual al de la función " + scope);
 		}
 	}
+
+	std::string generateCode() override
+	{
+		if (expression->getClassType() == "cons" || expression->getClassType() == "id")
+			return "\n\tmov eax," + expression->getSymbol() + "\n\tret";
+		else
+			return expression->generateCode();
+	}
 };
 
 class Constant : public Node
@@ -653,7 +808,7 @@ public:
 	void validateTypes(std::vector<SymbolsTableElement*>& symbolsTable,
 		std::vector<std::string>& errors) override
 	{
-		for (int i = 0; i < symbol.size(); i++)
+		for (size_t i = 0; i < symbol.size(); i++)
 		{
 			if (isdigit(symbol[i]))
 			{
@@ -670,6 +825,10 @@ public:
 			}
 		}
 		dataType = 'i';
+	}
+	std::string generateCode() override
+	{
+		return "push " + symbol + "\n";
 	}
 };
 
@@ -748,6 +907,26 @@ public:
 			next->validateTypes(symbolsTable, errors);
 		}
 	}
+
+	std::string generateCode() override
+	{
+		std::string code = "";
+		Node* aux = arguments;
+		if (id->getSymbol() == "print")
+			code += "\n\tprint str$(" + arguments->getSymbol() + ")\n";
+		else
+		{
+			while(aux)
+			{
+				code += "\tpush " + aux->getSymbol() + "\n";
+				aux = aux->getNext();
+			}
+			code += "\tcall " + id->getSymbol() + "\npush eax\n";
+		}
+		if (next)
+			return code += next->generateCode();
+		return code;
+	}
 };
 
 class Operation1 : public Node//<Expresion> ::= opSuma <Expresion> 
@@ -777,6 +956,26 @@ class Operation2 : public Node
 {
 	Node* right;
 	Node* left;
+
+	std::string expressionCode(const std::string& symbol)
+	{
+		std::string code = "";
+
+		code += "\n\tpop eax";
+		code += "\n\tpop ebx";
+
+		if (symbol == "*")
+			code += "\n\timul ebx";
+		else if (symbol == "+")
+			code += "\n\tadd eax,ebx";
+		else if (symbol == "-")
+			code += "\n\tsub eax,ebx";
+		else
+			code += "\n\tidiv ebx";
+		code += "\n\tpush eax\n";
+
+		return code;
+	}
 
 public:
 	Operation2(std::stack<StackElement*>& stack)
@@ -810,5 +1009,94 @@ public:
 			errors.push_back("Error en la expresión: " + left->getSymbol() + " " + symbol
 				+ " " + right->getSymbol());
 		}
+	}
+
+	std::string generateCode() override
+	{
+		std::string code = "";
+		if (symbol == "<" || symbol == "<=" || symbol == ">" || symbol == ">=" || symbol == "=="
+			|| symbol == "!=")
+		{
+			if (right->getSymbol() == "*" || right->getSymbol() == "+" || right->getSymbol() == "-" || right->getSymbol() == "/")
+			{
+				code += right->generateCode();
+				code += "\n\tmov ecx,eax";
+			}
+			else
+				code += "\n\tmov ecx," + right->getSymbol();
+			if (left->getSymbol() == "*" || left->getSymbol() == "+" || left->getSymbol() == "-" || left->getSymbol() == "/")
+			{
+				code += left->generateCode();
+				code += "\n\tmov edx,eax";
+			}
+			else
+				code += "\n\tmov edx," + left->getSymbol();
+			code += "\n\tcmp edx,ecx";
+		}
+		
+		if (symbol == "<")
+			return code + "\n\tjnl ";
+		if (symbol == "<=")
+			return code + "\n\tjnle ";
+		if (symbol == ">")
+			return code + "\n\tjng ";
+		if (symbol == ">=")
+			return code + "\n\tjnge ";
+		if (symbol == "==")
+			return code + "\n\tjne ";
+		if (symbol == "!=")
+			return code + "\n\tje ";
+
+
+		if (right->getSymbol() == "*" || right->getSymbol() == "+" || right->getSymbol() == "-" || right->getSymbol() == "/" || left->getSymbol() == "*" || left->getSymbol() == "+" || left->getSymbol() == "-" || right->getSymbol() == "/")
+		{
+			code += right->generateCode();
+			code += left->generateCode();
+			code += expressionCode(symbol);
+		}
+		else if ((right->getSymbol() != "*" && right->getSymbol() != "+" && right->getSymbol() != "-"&&right->getSymbol() != "/") && (left->getSymbol() != "*" && left->getSymbol() != "+" && left->getSymbol() != "-"&&left->getSymbol() == "/"))
+		{
+			if (right->getSymbol() == "")
+			{
+				code += right->generateCode();
+				code += "\n\tpush eax";
+			}
+			else
+				code += "\n\tpush " + right->getSymbol() + "\n";
+			if (left->getSymbol() == "")
+			{
+				code += left->generateCode();
+				code += "\n\tpush eax";
+			}
+			else
+				code += "\n\tpush " + left->getSymbol() + "\n";
+			code += expressionCode(symbol);
+		}
+		else if (right->getSymbol() != "*" && right->getSymbol() != "+" && right->getSymbol() != "-"&&right->getSymbol() != "/")
+		{
+			if (right->getSymbol() == "")
+			{
+				code += right->generateCode();
+				code += "\n\tpush eax";
+			}
+			else
+				code += "\n\tpush " + right->getSymbol() + "\n";
+			code += left->generateCode();
+			code += expressionCode(symbol);
+		}
+		else if (left->getSymbol() != "*" && left->getSymbol() != "+" && left->getSymbol() != "-"&&left->getSymbol() == "/")
+		{
+			code += right->generateCode();
+			if (left->getSymbol() == "")
+			{
+				code += left->generateCode();
+				code += "\n\tpush eax";
+			}
+			else
+				code += "\n\tpush " + left->getSymbol() + "\n";
+			code += expressionCode(symbol);
+		}
+
+		return code;
 	}
 };

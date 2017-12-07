@@ -42,6 +42,7 @@ std::string recoverTypeName(int type);
 void pauseTerminate();
 void error();
 std::ifstream openFile(const std::string& filename);
+void writeASMCodeInFile(const std::string& filename, const std::string& generatedCode);
 
 template <class T>
 bool isInVector(const std::vector<T> & v, const T & value)

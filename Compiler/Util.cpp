@@ -10,7 +10,7 @@ void pauseTerminate()
 
 std::ifstream openFile(const std::string& filename)
 {
-	std::ifstream file("../Files/" + filename, std::ios::in);
+	std::ifstream file("../Files/" + filename);
 
 	if (!file.is_open())
 	{
@@ -20,6 +20,30 @@ std::ifstream openFile(const std::string& filename)
 	}
 
 	return file;
+}
+
+void writeASMCodeInFile(const std::string& filename, const std::string& generatedCode)
+{
+	std::ofstream file(filename + ".asm");
+	std::string code = std::string(".386\n")
+		+ ".model flat, stdcall\n"
+		+ "option casemap:none \n\n"
+		+ "include \\masm32\\macros\\macros.asm\n"
+		+ "include \\masm32\\include\\masm32.inc\n"
+		+ "include \\masm32\\include\\kernel32.inc\n\n"
+		+ "includelib \\masm32\\lib\\masm32.lib\n"
+		+ "includelib \\masm32\\lib\\kernel32.lib\n\n"
+		+ ".data\n\n" + Node::varglobal
+		+ "\n"
+		+ "\n\n"
+		+ ".code\n"
+		+ "inicio:\n"
+		+ "\tcall main\n"
+		+ "\tpush 0\n"
+		+ "\tcall ExitProcess\n"
+		+ generatedCode
+		+ "\nend inicio";
+	file << code;
 }
 
 std::string recoverTypeName(int type)
